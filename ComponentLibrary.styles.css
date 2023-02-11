@@ -1,0 +1,7 @@
+/* _content/ComponentLibrary/CustomMessage.razor.rz.scp.css */
+.my-component[b-5f2ysqp067] {
+    border: 2px dashed red;
+    padding: 1em;
+    margin: 1em 0;
+    background-image: url('background.png');
+}
