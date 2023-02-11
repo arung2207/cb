@@ -1,0 +1,57 @@
+﻿@page "/ComputerGuesses"
+@using CowsAndBulls.Shared;
+<h3>Cows and Bulls - You think and computer guesses</h3>
+<h5 class="fst-italic text-primary"> Think of a 4-digit number and computer finds it based on the number of cows and bulls.</h5>
+<p> <button class="btn btn-primary btn-start-new-game" @onclick="GenerateAllCode">Start new game</button> </p>
+<ComponentLibrary.CustomMessage Hide="@false" Message="@message" />
+
+@*<SaveGameLog CanSave="canSave" Play="Play" SecretCode="@guess" WhoGuessed="Computer" Saved="@false" />
+*@
+<hr />
+<p class="guess">Guess: @guess (Out of @allCodes.Count possibilities)</p>
+<p>
+    Cows: <input @bind="cows" type="number" min="0" max="4" step="1" />
+    Bulls: <input @bind="bulls" type="number" min="0" max="4" step="1" />
+    <button class="btn btn-primary btn-input" @onclick="InputCowsAndBulls" disabled="@canSave">Input</button>
+</p>
+
+<PlayTrail Play="Play" />
+
+@code {
+    private string? guess;
+    private int cows;
+    private int bulls;
+    private List<Attempt> Play = new();
+    private List<string> allCodes = new();
+    private string? message = "";
+    private bool canSave = false;
+
+    private void GenerateAllCode()
+    {
+        allCodes = Helpers.GetAllCodes();
+        guess = Helpers.SelectRandomCode(allCodes);
+        Play = new();
+        cows = 0;
+        bulls = 0;
+        message = "Let us begin...";
+        canSave = false;
+    }
+
+    private void InputCowsAndBulls()
+    {
+        if (canSave) return;
+
+        var attempt = new Attempt { Guess = guess, Bulls = bulls, Cows = cows };
+        Play.Add(attempt);
+        allCodes = Helpers.GetPossibleCodes(allCodes, attempt);
+
+        guess = Helpers.SelectRandomCode(allCodes);
+        if (allCodes.Count == 0)
+            message = "Give up! I think you provided incorrect clues, please verify the count of cows and bulls.";
+        else if (allCodes.Count == 1)
+        {
+            message = "Game over. Found the number!";
+            canSave = true;
+        }
+    }
+}

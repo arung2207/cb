@@ -1,0 +1,48 @@
+﻿@page "/GameLog"
+@using CowsAndBulls.Shared;
+@inject HttpClient http
+@inject NavigationManager navigationManager;
+
+<h3>Game Log</h3>
+<p>
+    <button class="btn btn-primary" @onclick="RetainOnly5Records">Retain Only 5 Records</button>
+</p>
+@if (Logs == null)
+{
+    <text>Loading...</text>
+}
+else if (Logs.Length == 0)
+{
+    <text>No Records Found.</text>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Log (@Logs.Count())</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var logEntry in Logs)
+            {
+                <tr>
+                    <td>@logEntry.Log</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    GameLog[] Logs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logs = await http.GetFromJsonAsync<GameLog[]>("api/GameLogs");
+    }
+    private async Task RetainOnly5Records()
+    {
+        await http.DeleteAsync("api/GameLogs");
+        navigationManager.NavigateTo("GameLog", true);
+    }
+}

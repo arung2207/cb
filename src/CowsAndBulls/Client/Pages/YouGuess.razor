@@ -1,0 +1,52 @@
+﻿@page "/YouGuess"
+@inject IJSRuntime JSRuntime
+@using ComponentLibrary;
+@using CowsAndBulls.Shared;
+
+<h3>Cows and Bulls - Computer thinks and you guess</h3>
+<h5 class="fst-italic text-primary">Computer thinks of a 4-digit <span @ondblclick="RevealNumber">number</span> and you find it based on the number of cows and bulls.</h5>
+
+<p> <button class="btn btn-primary" @onclick="GenerateCode">Start new game</button> </p>
+<ComponentLibrary.CustomMessage Hide="@false" Message="@message" />
+@*<SaveGameLog CanSave="canSave" Play="Play" SecretCode="@guess" WhoGuessed="You" Saved="@false" />
+*@
+<hr />
+
+Guess:
+<input @bind="guess" maxlength="4" />
+<button class="btn btn-primary" @onclick="GetCowsAndBulls" disabled="@canSave">Input</button>
+
+<PlayTrail Play="Play" />
+
+@code {
+    private string? num;
+    private string? guess;
+    private List<Attempt> Play = new();
+    private string? message = "";
+    private bool canSave = false;
+
+    private void GenerateCode()
+    {
+        num = Helpers.GetRandomCode();
+        Play = new();
+        guess = "";
+        message = "Start guessing...";
+        canSave = false;
+    }
+
+    private void GetCowsAndBulls()
+    {
+        var attempt = Helpers.GetCowsAndBulls(num, guess);
+        Play.Add(attempt);
+        if (attempt.Bulls == 4)
+        {
+            message = "Found the number, well done!";
+            canSave = true;
+        }
+    }
+
+    private async void RevealNumber()
+    {
+        await (new ExampleJsInterop(JSRuntime)).Prompt($"Secret code revealed --> {num}");
+    }
+}

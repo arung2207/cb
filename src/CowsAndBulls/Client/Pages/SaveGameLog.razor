@@ -1,0 +1,45 @@
+﻿@using CowsAndBulls.Shared;
+@inject HttpClient http
+
+@if (CanSave)
+{
+    <button class="btn btn-primary" @onclick="SaveGameMessage">Save Game Log</button>
+    <div class="alert alert-warning" role="alert">
+        @if (Saved)
+        {
+            @message
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? WhoGuessed { get; set; }
+
+    [Parameter]
+    public string? SecretCode { get; set; }
+
+    [Parameter]
+    public List<Attempt> Play { get; set; } = new();
+
+    [Parameter]
+    public bool CanSave { get; set; }
+
+    [Parameter]
+    public bool Saved { get; set; } = false;
+
+    private string message = "";
+
+    private async Task SaveGameMessage()
+    {
+        if (!Saved)
+        {
+            //E.g. Computer guessed 4120 in 6 attempts - 1234,3456,2317,4128,4129,4120.
+            message = $"[{DateTime.Now.ToString("d-MMM-yyyy HH:mm")}]: {WhoGuessed} guessed {SecretCode} in {Play.Count} attempts - {string.Join(",", Play.Select(a => a.Guess))}.";
+
+            await http.PostAsJsonAsync("api/GameLogs", new GameLog { Log = message });
+
+            Saved = true;
+        }
+    }
+}

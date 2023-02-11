@@ -1,0 +1,32 @@
+﻿@using CowsAndBulls.Shared;
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>Attempt#</th>
+            <th>Guess</th>
+            <th>Cows</th>
+            <th>Bulls</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int c = 0;
+        }
+        @foreach (var p in Play)
+        {
+            c++;
+            <tr>
+                <td>@c</td>
+                <td>@p.Guess</td>
+                <td>@p.Cows</td>
+                <td>@p.Bulls</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public List<Attempt> Play { get; set; } = new();
+}
